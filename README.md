@@ -333,7 +333,7 @@ Protected route → Spring Security validates JWT
 
 ## 👤 Author
 
-**Erman** — University Sports Tournament Management System
+**Erman Bauyrzhan** — University Sports Tournament Management System
 
 ---
 
