@@ -20,7 +20,7 @@ const navItems = [
   },
 ];
 
-function Sidebar({ collapsed, onToggle }) {
+function Sidebar({ collapsed, onToggle, onClose }) {
   const { user, logout } = useAuth();
 
   // Display: username (from register) or email prefix
@@ -34,7 +34,21 @@ function Sidebar({ collapsed, onToggle }) {
       background: "#1e293b", borderRight: "1px solid #334155",
       transition: "width 300ms", width: collapsed ? 64 : 240, flexShrink: 0,
       position: "relative",
-    }}>
+    }}
+      className="!w-60 md:!w-auto"
+    >
+      {/* Mobile close button */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="md:hidden absolute top-3 right-3 z-10 text-slate-400 hover:text-white transition-colors p-1"
+          aria-label="Close menu"
+        >
+          <svg style={{ width: 20, height: 20 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      )}
       {/* Logo */}
       <div style={{
         display: "flex", alignItems: "center", gap: 12,
@@ -118,14 +132,15 @@ function Sidebar({ collapsed, onToggle }) {
         </div>
       </div>
 
-      {/* Collapse toggle */}
+      {/* Collapse toggle — desktop only */}
       <button
         onClick={onToggle}
+        className="hidden md:flex"
         style={{
           position: "absolute", right: -12, top: 72,
           width: 24, height: 24, borderRadius: "50%",
           background: "#1e293b", border: "1px solid #334155",
-          display: "flex", alignItems: "center", justifyContent: "center",
+          alignItems: "center", justifyContent: "center",
           cursor: "pointer", color: "#64748b", zIndex: 10,
         }}
         onMouseEnter={e => e.currentTarget.style.color = "white"}

@@ -28,7 +28,7 @@ function Navbar({ onMenuToggle }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-        <span className="font-display text-2xl tracking-wider text-white hidden sm:block">{title}</span>
+        <span className="font-display text-xl sm:text-2xl tracking-wider text-white">{title}</span>
       </div>
 
       {/* Right – user chip */}

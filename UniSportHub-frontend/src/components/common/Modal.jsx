@@ -27,7 +27,7 @@ function Modal({ isOpen, onClose, title, children, size = "md" }) {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
       role="dialog"
       aria-modal="true"
     >
@@ -38,7 +38,7 @@ function Modal({ isOpen, onClose, title, children, size = "md" }) {
       />
 
       {/* Panel */}
-      <div className={`relative card w-full ${sizeMap[size]} animate-in`}>
+      <div className={`relative card w-full ${sizeMap[size]} animate-in max-h-[90vh] overflow-y-auto rounded-b-none sm:rounded-b-xl`}>
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-semibold text-white">{title}</h2>
