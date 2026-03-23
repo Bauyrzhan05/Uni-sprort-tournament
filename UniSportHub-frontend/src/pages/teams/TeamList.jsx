@@ -31,6 +31,7 @@ function TeamModal({ isOpen, onClose, team, tournaments, onSaved }) {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
 
+
   const handleChange = (e) => {
     setError("");
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
