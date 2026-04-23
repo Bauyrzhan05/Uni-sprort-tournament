@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import useFetch from "../../hooks/useFetch";
 import { getPlayers, deletePlayer } from "../../api/playerService";
 import { getTeams } from "../../api/teamService";
+import useAuth from "../../hooks/useAuth";
 import Button        from "../../components/common/Button";
 import Loader        from "../../components/common/Loader";
 import EmptyState    from "../../components/common/EmptyState";
@@ -80,7 +80,8 @@ function AddPlayerModal({ isOpen, onClose, teams, onAdded }) {
 
 /* ── Page ───────────────────────────────────────────────────────────────────── */
 function PlayerList() {
-  const navigate = useNavigate();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "ROLE_ADMIN";
   const [search, setSearch]   = useState("");
   const [teamFilter, setTeam] = useState("");
   const [addOpen, setAddOpen] = useState(false);
@@ -128,7 +129,7 @@ function PlayerList() {
             {allPlayers.length} player{allPlayers.length !== 1 ? "s" : ""} registered
           </p>
         </div>
-        <Button onClick={() => setAddOpen(true)}><PlusIcon /> Add Player</Button>
+        {isAdmin && <Button onClick={() => setAddOpen(true)}><PlusIcon /> Add Player</Button>}
       </div>
 
       {/* Filters */}
@@ -152,7 +153,9 @@ function PlayerList() {
       {/* No-update notice */}
       <div className="px-4 py-2 rounded-lg text-xs"
         style={{ background: "rgba(249,115,22,0.08)", border: "1px solid rgba(249,115,22,0.2)", color: "#fdba74" }}>
-        ℹ️ To edit a player's details, delete them and add them again with the correct name.
+        {isAdmin
+          ? "Only admin should manually add or remove team members here."
+          : "Regular users cannot manually add or remove other users here. Use the Teams page to join or leave by yourself."}
       </div>
 
       {error && (
@@ -169,9 +172,9 @@ function PlayerList() {
         ) : players.length === 0 ? (
           <EmptyState
             title="No players found"
-            description="Add players and assign them to teams."
-            action={() => setAddOpen(true)}
-            actionLabel="Add Player"
+            description={isAdmin ? "Add players and assign them to teams." : "No players found for the current filters."}
+            action={isAdmin ? () => setAddOpen(true) : undefined}
+            actionLabel={isAdmin ? "Add Player" : undefined}
             icon={<BigUsersIcon />}
           />
         ) : (
@@ -212,9 +215,11 @@ function PlayerList() {
                       )}
                     </td>
                     <td className="table-cell text-right">
-                      <Button variant="danger" size="sm" onClick={() => setDeleteTarget(p)}>
-                        Delete
-                      </Button>
+                      {isAdmin && (
+                        <Button variant="danger" size="sm" onClick={() => setDeleteTarget(p)}>
+                          Delete
+                        </Button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -225,12 +230,14 @@ function PlayerList() {
       </div>
 
       {/* Modals */}
-      <AddPlayerModal
-        isOpen={addOpen}
-        onClose={() => setAddOpen(false)}
-        teams={allTeams}
-        onAdded={refetch}
-      />
+      {isAdmin && (
+        <AddPlayerModal
+          isOpen={addOpen}
+          onClose={() => setAddOpen(false)}
+          teams={allTeams}
+          onAdded={refetch}
+        />
+      )}
       <ConfirmDialog
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}

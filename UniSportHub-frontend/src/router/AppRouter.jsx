@@ -15,6 +15,7 @@ import TeamList          from "../pages/teams/TeamList";
 import TeamDetails       from "../pages/teams/TeamDetails";
 import PlayerList        from "../pages/players/PlayerList";
 import PlayerForm        from "../pages/players/PlayerForm";
+import VolunteerShifts   from "../pages/volunteer-shifts/VolunteerShifts";
 
 function AppRouter() {
   return (
@@ -46,6 +47,9 @@ function AppRouter() {
           {/* /players/new redirects back to /players (no backend create-standalone) */}
           <Route path="/players/new"      element={<PlayerForm />} />
           <Route path="/players/:id/edit" element={<PlayerForm />} />
+
+          {/* Volunteer Shifts */}
+          <Route path="/volunteer-shifts" element={<VolunteerShifts />} />
 
         </Route>
       </Route>

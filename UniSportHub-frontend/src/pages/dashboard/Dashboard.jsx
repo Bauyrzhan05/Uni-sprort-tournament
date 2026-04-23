@@ -165,6 +165,7 @@ function TournamentCard({ t }) {
 /* ── Dashboard page ─────────────────────────────────────────────────────────── */
 function Dashboard() {
   const { user } = useAuth();
+  const isAdmin = user?.role === "ROLE_ADMIN";
 
   const { data: tournaments, loading: tLoading } = useFetch(getTournaments);
   const { data: teams,       loading: teLoading } = useFetch(getTeams);
@@ -213,7 +214,7 @@ function Dashboard() {
         <div className="flex flex-wrap gap-3">
           <Link to="/tournaments/new" className="btn-primary"><PlusIcon /> New Tournament</Link>
           <Link to="/teams"           className="btn-ghost"><ShieldIcon sm /> Manage Teams</Link>
-          <Link to="/players/new"     className="btn-ghost"><UsersIcon sm /> Add Player</Link>
+          {isAdmin && <Link to="/players/new" className="btn-ghost"><UsersIcon sm /> Add Player</Link>}
         </div>
       </div>
 
@@ -277,7 +278,7 @@ function Dashboard() {
                         border: "1px solid rgba(14,165,233,0.2)",
                         padding: "2px 10px", borderRadius: 9999, fontSize: "0.75rem", fontWeight: 600,
                       }}>
-                        {team.players?.length ?? 0} players
+                        {team.memberCount ?? team.memberIds?.length ?? 0} members
                       </span>
                     </td>
                   </tr>

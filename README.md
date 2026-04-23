@@ -1,342 +1,337 @@
-# 🏆 UniSportHub
+# UniSportHub
 
-<div align="center">
+UniSportHub is a full-stack university sports management system built with Spring Boot, PostgreSQL, React, Vite, and JWT authentication. The project supports tournament management, secure team ownership and membership flows, player management, and volunteer shift selection.
 
-![UniSportHub Banner](https://img.shields.io/badge/UniSportHub-Tournament%20Management-0ea5e9?style=for-the-badge&logo=trophy&logoColor=white)
+## What This Project Does
 
-**University Sports Tournament Management System**
+- Register and login with JWT-based authentication
+- Manage tournaments with image upload
+- Create teams and enforce owner-based team management
+- Allow users to join or leave teams as themselves
+- Restrict manual team member management to admins
+- Manage players
+- Let users choose volunteer shifts and allow admins to review or clear them
 
-A full-stack web application for managing university sports tournaments, teams, and players.
+## Current Security Model
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?style=flat-square&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
-[![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black)](https://reactjs.org)
-[![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://postgresql.org)
-[![JWT](https://img.shields.io/badge/JWT-Auth-000000?style=flat-square&logo=jsonwebtokens&logoColor=white)](https://jwt.io)
-[![TailwindCSS](https://img.shields.io/badge/Tailwind-3.x-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+### Roles
 
-[Features](#-features) · [Tech Stack](#-tech-stack) · [Getting Started](#-getting-started) · [API Docs](#-api-endpoints) · [Project Structure](#-project-structure)
+- `ROLE_USER`
+- `ROLE_ADMIN`
 
-</div>
+### Team permissions
 
----
+- A logged-in user can create a team
+- The team creator becomes the owner
+- Only the team owner or an admin can update or delete that team
+- A normal user can join a team only as themselves
+- A normal user can leave a team only as themselves
+- A normal user cannot manually add or remove other users from a team
+- Only an admin can manually add or remove other users to or from a team
 
-## 📸 Screenshots
+### Volunteer shift permissions
 
-| Dashboard | Tournaments | Teams |
-|-----------|-------------|-------|
-| Stats, recent tournaments, team overview | Card grid with images, sport badges | Player roster, tournament assignment |
+- Any authenticated user can select or update their own shift
+- Any authenticated user can view their own shift
+- Only an admin can view all selected shifts
+- Only an admin can clear another user’s shift
 
----
-
-## ✨ Features
-
-- 🔐 **JWT Authentication** — Register / Login with role-based access (`ROLE_USER`, `ROLE_ADMIN`)
-- 🏆 **Tournament Management** — Create (with image upload), edit, delete, view details
-- 🛡 **Team Management** — Create teams, assign to tournaments, manage inline
-- 👥 **Player Management** — Add players to teams, filter by team
-- 🖼 **Image Upload** — Tournament cover images served as static resources
-- 📱 **Responsive UI** — Works on desktop and mobile
-- 🌙 **Dark Theme** — Deep navy design system throughout
-
----
-
-## 🛠 Tech Stack
+## Tech Stack
 
 ### Backend
-| Technology | Version | Purpose |
-|---|---|---|
-| Java | 17 | Language |
-| Spring Boot | 3.x | Framework |
-| Spring Security | 6.x | Authentication & Authorization |
-| JWT (jjwt) | 0.12 | Token generation & validation |
-| PostgreSQL | 15 | Database |
-| Spring Data JPA | — | ORM |
-| MapStruct | — | DTO mapping |
-| Lombok | — | Boilerplate reduction |
-| Gradle | 9.x | Build tool |
+
+- Java 17
+- Spring Boot 4.0.3
+- Spring Security
+- Spring Data JPA
+- PostgreSQL
+- JWT (`jjwt`)
+- MapStruct
+- Lombok
+- Gradle
 
 ### Frontend
-| Technology | Version | Purpose |
-|---|---|---|
-| React | 18 | UI Framework |
-| Vite | 5.x | Build tool & dev server |
-| React Router | 6 | Client-side routing |
-| Axios | — | HTTP client + JWT interceptor |
-| Tailwind CSS | 3 | Utility-first styling |
-| Context API + useReducer | — | Auth state management |
 
----
+- React
+- Vite
+- React Router
+- Axios
+- Tailwind CSS
+- Context API for auth state
 
-## 🚀 Getting Started
+## Project Structure
 
-### Prerequisites
+```text
+UniSportTournament/
+├── README.md
+├── UniSportHub-backend/
+│   ├── build.gradle
+│   └── src/main/
+│       ├── java/org/example/unisporthubbackend/
+│       │   ├── config/
+│       │   ├── controller/
+│       │   ├── dto/
+│       │   ├── entity/
+│       │   ├── exception/
+│       │   ├── mapper/
+│       │   ├── repository/
+│       │   ├── security/
+│       │   └── service/
+│       └── resources/
+│           └── application.properties
+└── UniSportHub-frontend/
+    ├── package.json
+    └── src/
+        ├── api/
+        ├── components/
+        ├── context/
+        ├── hooks/
+        ├── layouts/
+        ├── pages/
+        ├── router/
+        └── utils/
+```
+
+## Backend Features
+
+### Authentication
+
+Base path: `/api/auth`
+
+- `POST /register`
+- `POST /login`
+
+Backend returns a JWT token, and the frontend decodes it to keep user data in local storage.
+
+### Tournaments
+
+Base path: `/api/tournaments`
+
+- `GET /`
+- `GET /{id}`
+- `POST /` admin only
+- `PUT /{id}`
+- `DELETE /{id}`
+
+Notes:
+
+- Tournament creation uses multipart form data
+- Request parts: `tournament` and `image`
+- Tournament update and delete endpoints exist in the backend and should be treated carefully because controller-level protection is lighter than team ownership rules
+
+### Teams
+
+Base path: `/api/teams`
+
+- `GET /`
+- `GET /{id}`
+- `POST /`
+- `PUT /{id}`
+- `DELETE /{id}`
+- `POST /{id}/join`
+- `POST /{id}/leave`
+- `POST /{id}/members/{userId}` admin only
+- `DELETE /{id}/members/{userId}` admin only
+
+Important behavior:
+
+- Team owner is assigned automatically from the authenticated user
+- Team DTO includes permission flags and ownership metadata:
+  - `ownerId`
+  - `ownerName`
+  - `memberIds`
+  - `memberCount`
+  - `canManage`
+  - `isMember`
+
+### Players
+
+Base path: `/api/players`
+
+- `GET /`
+- `GET /{teamId}`
+- `POST /`
+- `DELETE /{id}`
+
+Note:
+
+- `GET /api/players/{teamId}` returns players by team id, not player details by player id
+
+### Volunteer Shifts
+
+Base path: `/api/volunteer-shifts`
+
+- `POST /` choose or update own shift
+- `GET /me` get current user’s shift
+- `GET /` admin gets all selected shifts
+- `DELETE /{userId}` admin clears a user shift
+
+Allowed shift values:
+
+- `MORNING`
+- `EVENING`
+
+Example request:
+
+```json
+{
+  "shift": "MORNING"
+}
+```
+
+## Frontend Features
+
+The React frontend reuses the existing JWT auth flow and Axios interceptor setup.
+
+### Current pages
+
+- `/dashboard`
+- `/tournaments`
+- `/tournaments/:id`
+- `/tournaments/new`
+- `/tournaments/:id/edit`
+- `/teams`
+- `/teams/:id`
+- `/players`
+- `/players/new`
+- `/players/:id/edit`
+- `/volunteer-shifts`
+
+### Frontend behavior
+
+- JWT is attached automatically through `axiosConfig.js`
+- Unauthorized requests clear stored auth and redirect to `/login`
+- Team pages use backend permission flags to decide which actions to show
+- Volunteer Shifts page shows the admin section only for `ROLE_ADMIN`
+
+## Getting Started
+
+## 1. Prerequisites
 
 - Java 17+
 - Node.js 18+
-- PostgreSQL 15+
-- Git
+- PostgreSQL
 
----
-
-### 1. Clone the repository
+## 2. Clone the project
 
 ```bash
-git clone https://github.com/your-username/UniSportHub.git
-cd UniSportHub
+git clone <your-repo-url>
+cd UniSportTournament
 ```
 
----
+## 3. Database setup
 
-### 2. Backend setup
-
-#### Create PostgreSQL database
+Create the database:
 
 ```sql
 CREATE DATABASE "UniSportHub-db";
 ```
 
-#### Configure application properties
+## 4. Backend configuration
 
-```bash
-cd UniSportHub-backend/src/main/resources
-cp application.properties.example application.properties
-```
+Current backend config file:
 
-Edit `application.properties`:
+`UniSportHub-backend/src/main/resources/application.properties`
+
+Current values in the repository point to:
+
+- database: `UniSportHub-db`
+- username: `postgres`
+- server port: `8080`
+
+Before production or public sharing, you should change:
+
+- database password
+- JWT signing key
+
+Recommended properties:
 
 ```properties
 spring.application.name=UniSportHub-backend
 server.port=8080
 
 spring.datasource.url=jdbc:postgresql://localhost:5432/UniSportHub-db
-spring.datasource.username=your_postgres_username
-spring.datasource.password=your_postgres_password
+spring.datasource.username=postgres
+spring.datasource.password=your_password
 
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 
-# Generate a strong key: openssl rand -base64 32
-token.signing.key=your_secret_key_here
+token.signing.key=your_base64_secret_key
 ```
 
-#### Run the backend
+## 5. Run the backend
 
-```bash
-cd UniSportHub-backend
-./gradlew bootRun
+Windows PowerShell:
+
+```powershell
+cd .\UniSportHub-backend
+.\gradlew.bat bootRun
 ```
 
-Backend starts at → `http://localhost:8080`
+Backend URL:
 
----
+`http://localhost:8080`
 
-### 3. Frontend setup
+## 6. Run the frontend
 
-```bash
-cd UniSportHub-frontend
-cp .env.example .env
-```
-
-Edit `.env`:
-
-```env
-VITE_API_BASE_URL=http://localhost:8080/api
-VITE_APP_NAME=UniSportHub
-VITE_TOKEN_KEY=unisport_token
-VITE_USER_KEY=unisport_user
-VITE_IMAGE_BASE_URL=http://localhost:8080
-```
-
-Install dependencies and run:
-
-```bash
+```powershell
+cd .\UniSportHub-frontend
 npm install
 npm run dev
 ```
 
-Frontend starts at → `http://localhost:5173`
+Frontend URL:
 
----
+`http://localhost:5173`
 
-### 4. Create first Admin user
+## 7. Create an admin user
 
-Register normally through the UI, then update the role directly in the database:
+Register a normal user through the app, then update the role in PostgreSQL:
 
 ```sql
-UPDATE users SET role = 'ROLE_ADMIN' WHERE email = 'your@email.com';
+UPDATE users
+SET role = 'ROLE_ADMIN'
+WHERE email = 'your-email@example.com';
 ```
 
-> Only `ROLE_ADMIN` users can create tournaments (with image upload).
+## Important Files
 
----
+### Backend
 
-## 📁 Project Structure
+- `UniSportHub-backend/src/main/java/org/example/unisporthubbackend/config/SecurityConfig.java`
+- `UniSportHub-backend/src/main/java/org/example/unisporthubbackend/controller/AuthController.java`
+- `UniSportHub-backend/src/main/java/org/example/unisporthubbackend/controller/TournamentController.java`
+- `UniSportHub-backend/src/main/java/org/example/unisporthubbackend/controller/TeamController.java`
+- `UniSportHub-backend/src/main/java/org/example/unisporthubbackend/controller/PlayerController.java`
+- `UniSportHub-backend/src/main/java/org/example/unisporthubbackend/controller/VolunteerShiftController.java`
+- `UniSportHub-backend/src/main/java/org/example/unisporthubbackend/service/TeamService.java`
 
-```
-UniSportHub/
-│
-├── 📂 UniSportHub-backend/
-│   └── src/main/java/org/example/unisporthubbackend/
-│       ├── config/
-│       │   ├── SecurityConfig.java        # JWT filter chain, CORS
-│       │   └── WebConfig.java             # Static resource handler (/uploads/**)
-│       ├── controller/
-│       │   ├── AuthController.java        # POST /api/auth/login, /register
-│       │   ├── TournamentController.java  # CRUD /api/tournaments
-│       │   ├── TeamController.java        # CRUD /api/teams
-│       │   └── PlayerController.java      # CRUD /api/players
-│       ├── dto/
-│       │   ├── TournamentDto.java
-│       │   ├── TeamDto.java
-│       │   ├── PlayerDto.java
-│       │   ├── AuthResponse.java          # { token }
-│       │   ├── LoginRequest.java          # { email, password }
-│       │   └── RegisterRequest.java       # { username, email, password }
-│       ├── entity/
-│       │   ├── Tournament.java
-│       │   ├── Team.java
-│       │   ├── Player.java
-│       │   ├── User.java
-│       │   └── Role.java                  # ROLE_USER, ROLE_ADMIN
-│       ├── mapper/                        # MapStruct mappers
-│       ├── repository/                    # JPA repositories
-│       ├── security/
-│       │   ├── JwtService.java            # Token generation & validation
-│       │   └── JwtAuthenticationFilter.java
-│       └── service/
-│           ├── AuthService.java
-│           ├── TournamentService.java
-│           ├── TeamService.java
-│           ├── PlayerService.java
-│           └── ImageService.java          # Saves images to /uploads/tournaments/
-│
-└── 📂 UniSportHub-frontend/
-    └── src/
-        ├── api/
-        │   ├── axiosConfig.js             # Axios instance + JWT interceptor
-        │   ├── authService.js             # Login, register, JWT decode
-        │   ├── tournamentService.js       # Tournament CRUD (multipart POST)
-        │   ├── teamService.js             # Team CRUD
-        │   └── playerService.js           # Player CRUD
-        ├── components/
-        │   ├── common/                    # Button, Input, Modal, Loader, Badge...
-        │   └── layout/                    # Sidebar, Navbar, Footer
-        ├── context/
-        │   └── AuthContext.jsx            # JWT auth state (Context + Reducer)
-        ├── hooks/
-        │   ├── useAuth.js
-        │   └── useFetch.js                # Generic data-fetching hook
-        ├── layouts/
-        │   ├── MainLayout.jsx             # Sidebar + Navbar shell
-        │   └── AuthLayout.jsx             # Centered auth shell
-        ├── pages/
-        │   ├── auth/                      # Login, Register
-        │   ├── dashboard/                 # Dashboard
-        │   ├── tournaments/               # List, Details, Create/Edit
-        │   ├── teams/                     # List, Details
-        │   └── players/                   # List
-        ├── router/
-        │   ├── AppRouter.jsx              # Full route tree
-        │   └── ProtectedRoute.jsx         # JWT-gated routes
-        └── utils/
-            ├── constants.js               # Env vars, endpoints, enums
-            └── helpers.js                 # formatDate, getImageUrl, formatPrize...
-```
+### Frontend
 
----
+- `UniSportHub-frontend/src/api/axiosConfig.js`
+- `UniSportHub-frontend/src/context/AuthContext.jsx`
+- `UniSportHub-frontend/src/router/AppRouter.jsx`
+- `UniSportHub-frontend/src/components/layout/Sidebar.jsx`
+- `UniSportHub-frontend/src/pages/teams/TeamList.jsx`
+- `UniSportHub-frontend/src/pages/teams/TeamDetails.jsx`
+- `UniSportHub-frontend/src/pages/volunteer-shifts/VolunteerShifts.jsx`
 
-## 📡 API Endpoints
+## Known Notes
 
-### Authentication — `/api/auth`
-| Method | Endpoint | Body | Response | Auth |
-|--------|----------|------|----------|------|
-| `POST` | `/api/auth/register` | `{ username, email, password }` | `{ token }` | ❌ Public |
-| `POST` | `/api/auth/login` | `{ email, password }` | `{ token }` | ❌ Public |
+- CORS is configured for `http://localhost:5173` and `http://localhost:3000`
+- Team security logic is stronger and more business-specific than tournament/player endpoints
+- The frontend already contains a Volunteer Shifts page and service integrated with JWT auth
+- Sensitive values are currently present in `application.properties`; move them to environment variables before deployment
 
-### Tournaments — `/api/tournaments`
-| Method | Endpoint | Body | Auth |
-|--------|----------|------|------|
-| `GET` | `/api/tournaments` | — | ✅ Any |
-| `GET` | `/api/tournaments/{id}` | — | ✅ Any |
-| `POST` | `/api/tournaments` | `multipart: tournament (JSON) + image (File)` | 🔒 ADMIN |
-| `PUT` | `/api/tournaments/{id}` | `TournamentDto (JSON)` | ✅ Any |
-| `DELETE` | `/api/tournaments/{id}` | — | ✅ Any |
+## README Update Summary
 
-### Teams — `/api/teams`
-| Method | Endpoint | Body | Auth |
-|--------|----------|------|------|
-| `GET` | `/api/teams` | — | ✅ Any |
-| `GET` | `/api/teams/{id}` | — | ✅ Any |
-| `POST` | `/api/teams` | `{ teamName, tournamentId? }` | ✅ Any |
-| `PUT` | `/api/teams/{id}` | `{ teamName }` | ✅ Any |
-| `DELETE` | `/api/teams/{id}` | — | ✅ Any |
+This README was updated to reflect:
 
-### Players — `/api/players`
-| Method | Endpoint | Body | Auth |
-|--------|----------|------|------|
-| `GET` | `/api/players` | — | ✅ Any |
-| `GET` | `/api/players/{teamId}` | — | ✅ Any |
-| `POST` | `/api/players` | `{ fullName, teamId? }` | ✅ Any |
-| `DELETE` | `/api/players/{id}` | — | ✅ Any |
+- current backend endpoints
+- secure team ownership rules
+- team join/leave and admin member management
+- volunteer shifts feature
+- actual frontend routes
+- current local run instructions
 
-> ⚠️ `GET /api/players/{teamId}` — returns players **filtered by team**, not a single player by ID.
-
----
-
-## 🔐 Authentication Flow
-
-```
-User → POST /api/auth/login { email, password }
-     ← { token: "eyJ..." }
-
-Frontend → decodes JWT payload → extracts { id, email, username, role }
-         → saves to localStorage
-         → attaches "Authorization: Bearer <token>" to every request
-
-Protected route → Spring Security validates JWT
-               → @PreAuthorize checks role
-```
-
----
-
-## ⚙️ Environment Variables
-
-### Backend — `application.properties`
-| Variable | Description |
-|---|---|
-| `spring.datasource.url` | PostgreSQL connection URL |
-| `spring.datasource.username` | DB username |
-| `spring.datasource.password` | DB password |
-| `token.signing.key` | JWT signing secret (Base64) |
-| `server.port` | Server port (default: 8080) |
-
-### Frontend — `.env`
-| Variable | Description |
-|---|---|
-| `VITE_API_BASE_URL` | Backend API base URL |
-| `VITE_IMAGE_BASE_URL` | Backend base URL for images |
-| `VITE_TOKEN_KEY` | localStorage key for JWT |
-| `VITE_USER_KEY` | localStorage key for user object |
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch — `git checkout -b feature/your-feature`
-3. Commit your changes — `git commit -m "feat: add your feature"`
-4. Push to the branch — `git push origin feature/your-feature`
-5. Open a Pull Request
-
----
-
-## 👤 Author
-
-**Erman Bauyrzhan** — University Sports Tournament Management System
-
----
-
-<div align="center">
-  <sub>Built with ☕ Java + ⚛️ React</sub>
-</div>

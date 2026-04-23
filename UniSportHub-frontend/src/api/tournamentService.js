@@ -1,5 +1,6 @@
 import axiosInstance from "./axiosConfig";
 import { ENDPOINTS } from "../utils/constants";
+import { getTeams } from "./teamService";
 
 /**
  * Tournament API — maps to Spring Boot TournamentController (/api/tournaments)
@@ -64,7 +65,7 @@ export const deleteTournament = (id) =>
  * This helper is kept for semantic convenience — it calls TeamService.
  */
 export const getTournamentTeams = (tournamentId) =>
-  axiosInstance.get(`/teams`).then((res) => ({
+  getTeams().then((res) => ({
     ...res,
     data: (res.data || []).filter((t) => t.tournamentId === tournamentId),
   }));
